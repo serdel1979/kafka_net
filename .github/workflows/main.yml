@@ -1,4 +1,4 @@
-name: Deploy to Debian Server
+name: Deploy to Railway VPS
 
 on:
   push:
@@ -16,21 +16,28 @@ jobs:
     - name: Build .NET application
       run: |
         dotnet publish -c Release -o output
+        
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H vps-production-c90b.up.railway.app >> ~/.ssh/known_hosts
 
-    - name: Deploy to Server
+    - name: Deploy to Railway VPS
       uses: appleboy/scp-action@v0.1.1
       with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
+        host: vps-production-c90b.up.railway.app  # Usar el dominio público de Railway
+        username: githubuser  # Tu usuario SSH en Railway (el nombre del contenedor o el usuario que configuraste)
         key: ${{ secrets.SERVER_SSH_KEY }}
         source: output/
         target: /var/www/Products/
 
-    - name: Restart Application on Server
+    - name: Restart Application on Railway VPS
       uses: appleboy/ssh-action@v0.1.1
       with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
+        host: vps-production-c90b.up.railway.app
+        username: githubuser
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           sudo systemctl restart products.service

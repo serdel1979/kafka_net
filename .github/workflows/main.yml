@@ -17,17 +17,6 @@ jobs:
       run: |
         dotnet publish -c Release -o output
 
-    - name: Debug SSH key
-      run: echo "${{ secrets.SERVER_SSH_KEY }}"
-
-        
-    - name: Setup SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
     - name: Deploy to Server
       uses: appleboy/scp-action@v0.1.1
       with:

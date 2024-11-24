@@ -16,6 +16,10 @@ jobs:
     - name: Build .NET application
       run: |
         dotnet publish -c Release -o output
+
+    - name: Debug SSH key
+      run: echo "${{ secrets.SERVER_SSH_KEY }}"
+
         
     - name: Setup SSH key
       run: |
